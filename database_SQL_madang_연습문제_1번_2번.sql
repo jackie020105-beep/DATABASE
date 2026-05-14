@@ -1,0 +1,89 @@
+--마당서점 P.213
+
+--연습문제 01
+--(1) 도서번호가 1인 도서 이름
+select bookname
+from book
+where bookid = 1;
+--(2) 가격이 20,000원 이상인 도서 이름
+select bookname
+from book
+where price >= 20000;
+--(3) '박지성'의 총 구매액
+select sum(saleprice) as 총구매액
+from orders
+where custid = 1;
+--(4) '박지성'이 구매한 도서 수
+select count(*)as 도서수
+from orders
+where custid = 1;
+--(5) '박지성'이 구매한 도서의 출판사 수
+select count(distinct publisher) as 출판사수
+from orders, book
+where orders.bookid = book.bookid 
+and orders.custid = 1;
+--(6) '박지성'이 구매한 도서의 이름, 가격, 정가와 판매가격의 차이
+select bookname as 도서이름, saleprice as 가격, (price - saleprice) AS 가격차이
+from orders, book
+where orders.bookid = book.bookid
+and orders.custid = 1;
+--(7) '박지성'이 구매하지 않은 도서의 이름
+select distinct bookname as 도서이름
+from orders, book
+where orders.bookid = book.bookid 
+and orders.custid IN (2, 3, 4, 5);
+
+--연습문제 02
+--(1) 마당서점 도서의 총수
+select count(*)as 총도서수
+from book;
+--(2) 마당서점에 도서를 출고하는 출판사의 총수
+select count(distinct publisher) as 출판사수
+from book;
+--(3) 모든 고객의 이름, 주소
+select name, address
+from customer;
+--(4) 2025년 7월 4일부터 7월 7일 사이에 주문받은 도서의 주문번호
+select orderid as 주문번호
+from orders
+where orderdate in ('25/07/04', '25/07/05', '25/07/06', '25/07/07');
+--(5) 2025년 7월 4일부터 7월 7일 사이에 주문받은 도서를 제외한 도서의 주문번호
+select orderid as 주문번호
+from orders
+where orderdate not in ('25/07/04', '25/07/05', '25/07/06', '25/07/07');
+--(6) 성이 '김'씨인 고객의 이름과 주소
+select name, address
+from customer
+where name like '%김%';
+--(7) 성이 '김'씨이고 이름이 '아'로 끝나는 고객의 이름과 주소
+select name, address
+from customer
+where name like '%김_아%';
+--(8) 주문하지 않은 고객의 이름(부속질 사용)
+SELECT name
+FROM Customer
+WHERE custid NOT IN (SELECT custid FROM Orders);
+--(9) 주문 금액의 총액과 주문의 평균 금액
+select sum(saleprice)as 주문총액, avg(saleprice)as 평균금액
+from orders
+where saleprice;
+--(10) 고객의 이름과 고객별 구매액
+select name as 고객이름, sum(saleprice)
+from customer, orders
+where customer.custid = orders.custid
+group by name;
+--(11) 고객의 이름과 고객이 구매한 도서 목록
+select name as 이름, bookname as 도서이름
+from customer, orders, book
+where customer.custid = orders.custid
+and orders.bookid = book.bookid;
+--(12) 도서의 가격(Book 테이블)과 판매가격(Orders 테이블)의 차이가 가장 많은 주문
+select max(price-saleprice) as 차이가가장많이나는주문
+from book, orders
+where orders.bookid = book.bookid;
+--(13) 도서의 판매액 평균보다 자신의 구매액 평균이 더 높은 고객의 이름
+SELECT c.name AS 이름
+FROM customer c, orders o
+WHERE c.custid = o.custid
+GROUP BY c.name
+HAVING AVG(o.saleprice) > (SELECT AVG(saleprice) FROM orders);
